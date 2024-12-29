@@ -1,0 +1,200 @@
+#+TITLE: IT - Emacs
+#+category: Emacs
+
+* IT - Emacs
+** OS-Specifics
+*** Arch-Linux
+
+Spacemacs probiert, dann fuer DOOM entschieden. Im folgenden wird Emacs installiert und die bereits existierenden Dendron Dateien (.md) nach org konvertiert.
+
+#+BEGIN_SRC sh
+    pacman -Syu emacs
+    emacs
+    rm .emacs -rf
+    rm .emacs.d -rf
+    find . -name \*.md -type f -exec pandoc  -f markdown -t org -o {}.org {} \;
+    find . -depth -name *.md.org -exec sh -c 'f={}; mv -- $f ${f%.md.org}.org;' {} \;
+#+END_SRC
+
+see https://wiki.archlinux.org/title/Spacemacs#Install_Emacs
+
+Die folgenden fonts muessen installiert sein, damit Doom auch "gut" aussieht:
+
+ttf-jetbrains-mono
+ttf-symbola
+ttf-all-the-icons
+ttf-atom-file-icons
+ttf-font-awesome-4
+ttf-material-desing-icons
+ttf-weather-icons
+
+*** Windows pur
+
+**** Setzen Umgebungsvariable HOME auf C:\Users\USERNAME
+**** Download [[https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep-13.0.0-i686-pc-windows-msvc.zip][ripgrep]]
+***** entpacken und Pfad in PATH aufnehmen
+**** Download [[https://github.com/sharkdp/fd/releases/download/v8.5.3/fd-v8.5.3-x86_64-pc-windows-msvc.zip][fd]]
+***** entpacken und Pfad in PATH aufnehmen
+**** Download [[https://ftp.gnu.org/gnu/emacs/windows/emacs-29/emacs-29.4.zip][emacs]]
+***** entpacken und Pfad in PATH aufnehmen
+**** in emacs M-x all-the-icons-install-fonts
+Die Fonts in einen Ordner speichern (auswahl) und dann manuell installieren
+**** Install Doom
+
+#+BEGIN_SRC sh
+cd \Users\USERNAME
+git -c http.sslVerify=false clone https://github.com/hlissner/doom-emacs .emacs.d
+git config --global http.sslVerify false
+git config --global http.sslBackend schannel
+git config --global http.schannelCheckRevoke false
+#+END_SRC
+
+install git-bash (git for windows mit msys2), das sich dann unter \Users\USERNAME\AppData\Local\Programs\Git\cmd findet.
+
+#+BEGIN_SRC
+set GIT_SSL_NO_VERIFY=1
+.emacs.d\bin\doom.cmd install
+#+END_SRC
+
+*** Transformation von (dendron) Markdown zu org
+#+BEGIN_SRC sh
+    sudo apt install fd-find
+    fdfind . -I --extension=md --type=f --exec bash -c 'pandoc -f markdown -t org -o "/home/triplem/Dendron/${1%.md}".org "$1"' - '{}' \;
+    sed -i 's/\[ \]/TODO/g' *
+    sed -i 's/\[x\]/DONE/g' *
+    sed -i 's/\[-\]/CANC/g' *
+    sed -i 's/^TODOTODO-/**/g' *
+    sed -i 's/^-TODO/* /g' *
+    sed -i 's/\[\[/\[\[\.\//g' *
+    sed -i 's/\]\]/\.org\]\]/g' *
+    sed -i -E 's/\[\[\.\/.*\|(.*\.org)\]\]/\[\[\.\/\1\]\]/g' *
+#+END_SRC
+*** emacs workflow
+Hier eine kurze Einführung in meinen Workflow. Dies ist keine Empfehlung, sondern nur das, was in der Situation am besten zu mir passt(e). Da ich von Dendron komme ist denote bzw. org-roam eine sehr
+ähnliche Methodik. Ich bin allerdings erstmal dabei geblieben, org-mode default-mäßig zu nutzen (bis auf wenige zusätzliche Pakete).
+
+**** Meetings, die vorbereitet und nachbereitet werden müssen --> Abgaben, Abstimmungen, JF
+**** Mitarbeiter, denen man Aufgaben delegiert und dann entsprechend abfragen muss --> Menschen, haben Geburtstag, Jourfixe, ...
+**** Aufgaben (meist dann größer), die entstehen und nachverfolgt werden müssen --> Projekte
+**** Todo kommt rein und wird in der Inbox (täglich) notiert
+**** Todo bekommt ggf. Schedule oder Deadline und/ oder Tags
+**** Todos in Inbox ohne Schedule und/ oder Deadline sollten direkt am Abend nochmals betrachtet werden
+**** Todos sollten in ein Projekt verschoben werden
+**** Todos können delegiert werden, und sollten dann entsprechend nachverfolgt werden (schedule bzw deadline) mit klarer Notiz an wen diese delegiert wurden
+**** Meetings können regelmäßig auftreten
+**** Jeder Tag hat regelmäßige Tasks, die ausgeführt werden müssen/ sollen
+**** Meetings haben eine Agenda, die erstellt und "abgearbeitet" werden muss
+**** Im Meeting werden Actions-Items an dem Meeting notiert und dann zu den entsprechenden Projekten verschoben
+#+BEGIN_SRC sh
+    @startuml
+    state "Capture New Task" as NewTask
+    [*] --> TODO
+
+    TODO --> CANC
+    TODO --> WAIT
+    TODO --> DONE
+
+    WAIT --> DONE
+    WAIT --> TODO
+    WAIT --> CANC
+
+    MEET --> WAIT
+    MEET --> DONE
+    @enduml
+#+END_SRC
+**** Projekte sind Top-Level Tasks, bestenfalls mit einem TAG
+Ich orientiere mich hierbei stark an http://doc.norang.ca/org-mode.html.
+
+**** emacs starten/ stoppen
+Man kann dann emacs über das Icon zB. in GNOME starten oder über die Kommandozeile mit
+
+#+BEGIN_SRC sh
+als normaler nutzer: systemctl --user CMD emacs
+#+END_SRC
+
+** Configuration Settings
+*** font in emacs
+
+https://www.reddit.com/r/emacs/comments/jsoveg/jetbrains_mono_settings_for_emacs/
+
+** webdav (Austausch mit Orgzly)
+
+Um org-mode Dateien auch remote (auf dem Smartphone) nutzen zu können, war die Idee, Webdav auf dem lokalen Rechner (unter der WSL) zu nutzen. Das folgende gibt einen Überblick, wie die Installation
+und die Konfiguration aussieht.
+
+#+BEGIN_SRC sh
+sudo apt install apache2
+sudo a2enmod dav
+sudo a2enmod dav_fs
+sudo ln -s /mnt/c/Users/USERNAME/org-mode/ /var/www/org-mode-dav
+sudo vim /etc/apache2/sites-available/org-mode-dav.conf
+
+<VirtualHost *:80>
+  ServerAdmin admin@example.com
+  ServerName webdav.example.com
+  DocumentRoot /var/www/html
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+  Alias /org-mode /var/www/org-mode-dav
+
+  <Directory />
+      Options FollowSymLinks
+      AllowOverride None
+  </Directory>
+
+  <Directory /var/www/org-mode-dav>
+     DAV On
+     DirectoryIndex disabled
+     Options FollowSymLinks
+     order allow,deny
+     allow from all
+  </Directory>
+</VirtualHost>
+
+sudo a2ensite org-mode-dav
+sudo a2dissite 000-default
+sudo service apache2 restart
+#+END_SRC
+
+Dies hat auch super geklappt, allerdings sind dann die Netzwerkeinstellungen dann noch anzupassen. Insbesondere, wenn man einen VPN Tunnel nutzt (bzw. nutzen muss), führt dies zu Problemen.
+
+#+BEGIN_SRC sh
+-- IP ist die IP der WSL
+netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=80 connectaddress=192.168.29.40
+#+END_SRC
+
+** doom emacs (evil) shortcuts
+
+see: https://cheatography.com/karronqiu/cheat-sheets/the-ultimate-doom-emacs/
+see: https://blog.codepen.io/2014/02/21/vim-key-bindings/
+
+  | Action                                        | Shortcut        |
+  |-----------------------------------------------+-----------------|
+  | other-window                                  | SPC w C-w       |
+  | switch buffer                                 | SPC b [ or ]    |
+  | eval buffer (load config)                     | SPC m e b       |
+  | load personal config                          | SPC f P         |
+  | change todo status                            | SPC m t - state |
+  | structure editing (org-move-subtree-up)       | M-Up            |
+  | org-move-subtree-down                         | M-Down          |
+  | Capture Note                                  | SPC-n n         |
+  | Open new file                                 | C-x C-f         |
+  | Window Setting Undo                           | SPC w u         |
+  | Window Setting Redo                           | SPC w r         |
+  | next word                                     | w               |
+  | prvevious word                                | b               |
+  | insert mode                                   | i               |
+  | Insert mode (before first whitespace on line) | I               |
+  | append mode                                   | a               |
+  | append mode (after end of line)               | A               |
+
+** Emacs Links
+*** https://abdelhakbougouffa.pro/posts/config/
+*** https://medium.com/@aria_39488/the-niceties-of-evil-in-doom-emacs-cabb46a9446b
+*** A Draft Workflow for Advanced Project Management Using Org Mode and Org Edna
+https://karl-voit.at/2020/08/14/project-mgt-draft/
+
+** org-mode tipps
+- org-contacts: https://develop.spacemacs.org/layers/+emacs/org/README.html#org-contacts-support
+- org-journal: https://github.com/bastibe/org-journal

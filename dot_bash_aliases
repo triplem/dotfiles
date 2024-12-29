@@ -1,11 +1,30 @@
 #
 # ~/.bash_alias
 #
+# navigation
 alias ..='cd ..'
+alias ...='cd ../..'
+alias .3='cd ../../..'
+alias .4='cd ../../../..'
+alias .5='cd ../../../../..'
+
 alias ll='ls -lah'
+alias l.='ls -lah ..'
+alias l..='ls -lah ../..'
 
 alias sudo='sudo '
 alias ssh-init='ssh-add ~/.ssh/id_rsa'
 alias pm='sudo pacman -S'
 alias pmy='sudo pacman -Syu'
+alias yaysu='yay -Syu'
+
 alias vi='vim'
+
+alias emacskill="emacsclient -e '(kill-emacs)'"
+
+alias emacs="emacsclient -c -a 'emacs'" # GUI versions of Emacs
+alias em="/usr/bin/emacs -nw" # Terminal version of Emacs
+alias rem="killall emacs || echo 'Emacs server not running'; /usr/bin/emacs --daemon" # Kill Emacs and restart daemon..
+
+alias df="df -h" # human-readable
+alias grep='grep --color=auto' # colorize output (good for log files)
