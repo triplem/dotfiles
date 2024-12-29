@@ -1,0 +1,55 @@
+# mbsyncrc config
+# https://manpages.debian.org/buster/isync/mbsync.1.en.html
+#
+# mkdir -p .mail/gmail/Inbox .mail/javafreedom/Inbox .mail/gmx/Inbox
+# rum mbsync -a
+
+CopyArrivalDate yes  # Don't mess up message timestamps when moving them between folders.
+Sync New Gone        # will propagate message arrivals and deletions both ways
+Create Near          # Automatically create new folders in the local copy.
+Remove Near          # Automatically remove deleted folders from the local copy.
+Expunge Both         # Expunge deleted messages from the local copy.
+Create Near          # create local mailboxes (folders?) if required
+
+# to allow utf-8 gmx specific folders we do need to use a version as of 2022
+# this is provided in the isync-git AUR package
+# yay -S isync-git
+IMAPAccount gmx.net
+Host imap.gmx.net
+User {{.personal.email.primary}}
+PassCmd "gopass show -o email/gmx.net/{{.personal.email.primary}}"
+TLSType IMAPS
+
+IMAPStore gmx-remote
+Account gmx.net
+
+MaildirStore gmx-local
+Path ~/.mail/gmx/
+Inbox ~/.mail/gmx/Inbox/
+SubFolders Verbatim
+
+Channel gmx
+Far :gmx-remote:
+Near :gmx-local:
+Patterns "INBOX" "Gesendet" "Entwürfe" "Gelöscht"
+SyncState *
+
+IMAPAccount javafreedom
+Host eurydome.uberspace.de
+User {{.personal.email.secondary}}
+PassCmd "gopass show -o email/javafreedom.org/{{.personal.email.secondary}}"
+TLSType IMAPS
+
+IMAPStore javafreedom-remote
+Account javafreedom
+
+MaildirStore javafreedom-local
+Path ~/.mail/javafreedom/
+Inbox ~/.mail/javafreedom/Inbox/
+SubFolders Verbatim
+
+Channel javafreedom
+Far :javafreedom-remote:
+Near :javafreedom-local:
+Patterns "INBOX" "Sent" "wifi-frankfurt" "Trash" "Drafts"
+SyncState *

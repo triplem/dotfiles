@@ -1,0 +1,14 @@
+#+title: README
+
+These dotfiles are managed using [[https://github.com/twpayne/chezmoi][chezmoi]].
+
+Oh, and I do use [[https://archlinux.org/][ArchLinux]], btw.
+
+I do also work on a couple of M$ Windoze machines. On the Windoze machines the WSL is used (Ubuntu based) to be able to use tools like eg. timewarrior.
+
+* Tools
+** [[https://github.com/doomemacs/doomemacs][Doom Emacs]]
+** [[https://www.djcbsoftware.nl/code/mu/mu4e.html][mu4e]]
+** [[https://github.com/gburd/isync][mbsync]] - called isync nowadays
+** [[https://timewarrior.net/][timewarrior]]
+** [[https://github.com/gopasspw/gopass][gopass]]

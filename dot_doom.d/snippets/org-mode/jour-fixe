@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: jour-fixe
+# key: jf
+# contributor : Markus M. May
+# --
+** MEET JF ${1:`(nth 0 (plist-get (org-export-get-environment) ':title))`}
+SCHEDULED: `(triplem/org-time-stamp-string)`
+*** Wie geht es Dir?
+*** Hast du Themen?
+*** erinnern an Urlaub - sobald bekannt
+*** erinnern an mycerti.pro
+*** Wie sieht die Auslastung aus?

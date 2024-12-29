@@ -1,0 +1,167 @@
+#+title: Security-Setup
+
+* Security Setup
+
+** git-server
+
+This could be used for the password storeage (gopass).
+
+Follow the git server instructions https://miracoin.wordpress.com/2014/11/25/step-by-step-guide-on-setting-up-git-server-in-arch-linux-pushable/[here] and in the https://git-scm.com/book/en/v2/Git-on-the-Server-Setting-Up-the-Server[Git SCM Book].
+
+I just created a project called `secrets.git` to be able to store the passwords from gopass in here.
+
+Please note, that the home directory of the git-user should be set to /srv/git. The git-shell is already configured in the currently installed version, so that just the commands `push` and `pull` can be used as a security restriction.
+
+** dropbear ssh-server
+
+*** install dropbear
+*** disable root login in /usr/systemd/system/dropbear.service using `-w` as well as `-s` to disallow the password login as well.
+
+----
+ExecStart=/usr/bin/dropbear -F -w -s -P /run/dropbear.pid -R
+----
+
+*** copy your public ssh key to /srv/git/.ssh/authorized_keys
+
+----
+mkdir -p /srv/git/.ssh
+cp /tmp/id_rsa.git /srv/git/.ssh/authorized_keys
+chown git:git /srv/git/.ssh -R
+chmod 0700 /srv/git/.ssh
+chmod 0600 /srv/git/.ssh/authorized_keys
+----
+
+** gpg
+
+Since up until now, I did not own a valid primary key, I just created one, using the "usual" method. This key is never invalidated and I used RSA4096. In the comment I specifically stated, that this is my primary key.
+
+----
+gpg --full-generate-key
+----
+
+Since this key is rather important, it should be backed up:
+
+----
+umask 077; tar -cf $HOME/gnupg-backup.tar -C $HOME .gnupg
+----
+
+Add a sub-key using the following commands
+
+----
+gpg --list-keys
+gpg --edit-key PRIMARYKEYID
+
+# add signing key
+gpg> addkey
+4 - RSA (signing only)
+4096
+unlimited validity
+
+gpg> save
+
+gpg --list-keys --with-keygrip
+----
+
+Follow the instructions in the wiki to remove the primary key and use the subkey for the encryption with gopass.
+
+IMPORTANT!!!!
+Please backup your primary key beforehand.
+
+** gopass
+
+----
+pacman -S gnupg gopass gopass-jsonapi
+----
+
+To be able to use gopass on several machines, we could follow https://github.com/gopasspw/gopass/issues/914[gopass on multiple machines - github issue].
+
+a. export the private gpg key and copy it to the other machine, this is rather insecure
+b. add addtional user (gpg recipients) to gopass
+c. use gpg subkeys
+
+I do like the idea of subkeys and have found a pretty good explanation of it on the https://wiki.debian.org/Subkeys[debian wiki].
+
+----
+gopass setup
+
+gopass create
+----
+
+add some keys
+
+----
+gopass-jsonapi configure
+----
+
+*** Import
+
+- yay -S pass-import
+- this was not working for me, therefore:
+
+----
+cd ~/.cache/yay/pass-import
+gpg --recv-keys 06A26D531D56C42D66805049C5469996F0DF68EC
+makepkg
+----
+
+export PASSWORD_STORE_DIR=~/.local/share/gopass/stores/root/
+pass import google-export.csv
+
+
+----
+wget https://github.com/roddhjav/pass-import/releases/download/v3.2/pass-import-3.2.tar.gz.asc
+----
+
+** Android App (password store)
+
+*** install OpenKeychain Easy PGP
+*** on laptop
+
+----
+gpg --export-secret-key -a WHOEVER_YU_ARE > secret.key
+----
+
+*** import it on cell phone.
+
+
+*** install app `Password Store`
+*** generate ssh-key
+*** add generated pub-key to /srv/git/.ssh/authorized_keys
+*** add above generated git repo
+*** delete already existing git repo
+*** clone remote repo
+
+*** upload key to keyserver.ubuntu.com
+*** upload key to github.com, it can be found on github.com/triplem.gpg
+
+** yubikey
+
+----
+pacman -S yubikey-manager
+----
+
+Start yubikey manager:
+- set Interfaces on USB as well as NFC:
+  - FIDOU2F
+  - FIDO2
+  - OpenPGP
+
+initial pin 123456
+initial admin pin 12345678
+new pins are stored in gopass :-)
+do not forget to set "reset code"
+
+account name: mmay
+url: https://github.com/triplem.gpg
+
+https://developer.okta.com/blog/2021/07/07/developers-guide-to-gpg
+
+gpg --edit-key 193AE4F223C0BA6F8D7E4C4A251023C3A3FB669A (my personal key id)
+
+
+gnupg-inital-keys-backup.tar contains original primary key
+backup-yubikey-gnupg.tar contains keys from second yubikey (after export to key)
+original-yubikey-gnupg.tar contains keys from first yubikey (after export to key)
+reassign with gpg --card-edit // fetch -- use gnupg-secondary-keys-backup.tar
+
+see: https://support.yubico.com/hc/en-us/articles/360013790259-Using-Your-YubiKey-with-OpenPGP

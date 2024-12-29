@@ -1,0 +1,62 @@
+;;; email.el -*- lexical-binding: t; -*-
+
+;; mbsync is called isync and seems to be the default for doom
+;; see https://isync.sourceforge.io/
+;; this can be directly installed on arch
+;; sudo pacman -S isync
+;;
+;; furthermore we do need to install mu
+;; yay -S mu
+;;
+;; see .mbsyncrc for additonal info about mu
+;; https://jherrlin.github.io/posts/emacs-mu4e/
+;;
+;; mu init --maildir=~/.mail --my-address=mmay@gmx.net --my-address=mmay@javafreedom.org
+;; mu index
+;;
+
+;;";" is bound to switch context
+(setq
+      mu4e-compose-format-flowed t
+      mu4e-use-fancy-chars t
+      mu4e-compose-context-policy 'ask-if-none)
+
+(set-email-account!
+ "GMX"
+ '((mu4e-sent-folder . "/gmx/Gesendet")
+   (mu4e-drafts-folder  . "/gmx/Entwürfe")
+   (mu4e-trash-folder  . "/gmx/Gelöscht")
+   (user-mail-address . "{{.personal.email.primary}}")
+   (user-full-name    . "{{.personal.name}}")
+   (mu4e-compose-reply-to-address . "{{.personal.email.primary}}")
+   (smtpmail-smtp-user . "{{.personal.email.primary}}")
+   (smtpmail-smtp-server  . "mail.gmx.net")
+   (smtpmail-smtp-service . 587))
+t)
+
+(set-email-account!
+ "Javafreedom"
+ '((mu4e-sent-folder . "/javafreedom/Sent")
+   (mu4e-drafts-folder . "/javafreedom/Drafts")
+   (mu4e-trash-folder . "/javafreedom/Trash")
+   (user-mail-address . "{{.personal.email.secondary}}")
+   (user-full-name . "{{.personal.name}}")
+   (mu4e-compose-reply-to-address . "{{.personal.email.secondary}}")
+   (smtpmail-smtp-user . "{{.personal.email.secondary}}")
+   (smtpmail-smtp-server . "eurydome.uberspace.de")
+   (smtpmail-smtp-service . 587))
+nil)
+
+(require 'auth-source-gopass)
+
+(setq auth-source-gopass-path-prefix "email")
+
+(defun construct-entry-path (_backend _type host user _port)
+  (mapconcat 'identity (list auth-source-gopass-path-prefix
+                             (mapconcat 'identity (cdr (split-string host "\\.")) ".")
+                             user) auth-source-gopass-path-separator))
+
+(setq auth-source-gopass-construct-query-path 'construct-entry-path)
+
+;;(advice-add 'auth-source-gopass--gopass-construct-entry-path :override #'construct-entry-path)
+(auth-source-gopass-enable)

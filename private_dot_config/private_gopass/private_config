@@ -1,0 +1,15 @@
+[core]
+	cliptimeout = 45
+	autoimport = true
+	parsing = true
+	exportkeys = true
+	nopager = false
+	notifications = true
+[mounts]
+	path = /home/triplem/.local/share/gopass/stores/root
+[age]
+	usekeychain = false
+[show]
+	safecontent = false
+[generate]
+	autoclip = false

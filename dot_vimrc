@@ -1,0 +1,4 @@
+set nu
+set clipboard=unnamedplus
+set paste
+

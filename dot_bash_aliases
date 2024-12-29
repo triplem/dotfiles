@@ -1,0 +1,11 @@
+#
+# ~/.bash_alias
+#
+alias ..='cd ..'
+alias ll='ls -lah'
+
+alias sudo='sudo '
+alias ssh-init='ssh-add ~/.ssh/id_rsa'
+alias pm='sudo pacman -S'
+alias pmy='sudo pacman -Syu'
+alias vi='vim'

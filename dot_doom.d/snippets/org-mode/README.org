@@ -1,0 +1,3 @@
+* YaSnippets
+
+For easier org-mode usage, several Snippets are provided.
