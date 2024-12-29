@@ -11,4 +11,19 @@ I do also work on a couple of M$ Windoze machines. On the Windoze machines the W
 ** [[https://www.djcbsoftware.nl/code/mu/mu4e.html][mu4e]]
 ** [[https://github.com/gburd/isync][mbsync]] - called isync nowadays
 ** [[https://timewarrior.net/][timewarrior]]
+For timewarrior please note especially some extensions, I have written.
+[[https://github.com/triplem/dotfiles/blob/main/dot_timewarrior/extensions/executable_timesheet.py][Timesheet-Extension]]
 ** [[https://github.com/gopasspw/gopass][gopass]]
+
+* Private Data
+
+Some private Data like eg. Email-Address and real name are stored in a file called .chezmoidata.yaml. Right now the following data is contained in there
+
+#+BEGIN_SRC yaml
+personal:
+  name: Mareike Musterfrau
+  email:
+    primary: mmuster@personal.de
+    secondary: muster@personal.org
+    alias: analias@personal.org
+#+END_SRC

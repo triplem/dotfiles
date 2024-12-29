@@ -1,0 +1,3 @@
+* Doom Emacs Config
+I do use Doom Emacs and some additional packages. One of those is [[https://github.com/triplem/auth-source-gopass][Auth-Source-Gopass]], an Authorization Provider for the gopass Password Manager, which I do use. This
+is useful to be able to access the Passwords stored in there in the mu4e email mode.
