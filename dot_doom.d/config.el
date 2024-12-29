@@ -132,7 +132,6 @@
   (setq org-journal-start-on-weekday calendar-week-start-day)
   (setq org-journal-file-format "%Y-%V.org")
   (setq org-journal-carryover-items  "TODO=\"TODO\"|TODO=\"MEET\"|TODO=\"WAIT\"")
-  (setq org-journal-time-format "")
   (setq org-journal-enable-agenda-integration t)
 
   (defun org-journal-file-header-func (time)
