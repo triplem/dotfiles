@@ -189,7 +189,7 @@
                       (org-deadline-warning-days 0)
                       (org-deadline-past-days 0)
                       (org-scheduled-past-days 0)
-                      (org-agenda-prefix-format "%(or (org-entry-get (point) \"PARTICIPANT\") \"\")")
+                      (org-agenda-prefix-format "%(let ((p (org-entry-get (point) \"PARTICIPANT\"))) (when p (concat p \" \")))")
                       (org-super-agenda-groups
                        '((:name "Today"
                                 :time-grid t
@@ -200,8 +200,7 @@
           (alltodo "" ((org-agenda-overriding-header "")
                        (org-agenda-skip-scheduled-if-done t)
                        (org-agenda-skip-scheduled-if-deadline-is-shown t)
-                       (org-agenda-prefix-format
-                         "%(triplem/org-agenda-prefix)") 
+                       (org-agenda-prefix-format "%(triplem/org-agenda-prefix)") 
                         (org-super-agenda-groups
                         '((:name "Due Soon"
                                  :deadline future
@@ -308,5 +307,5 @@
   (let ((scheduled (org-get-scheduled-time (point)))
         (participant (org-entry-get (point) "PARTICIPANT" t)))
     (concat (if scheduled (format-time-string "%Y-%m-%d " scheduled) "")
-            (or participant "")
-            " ")))
+            (if participant (concat participant " ") ""))))
+
