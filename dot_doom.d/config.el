@@ -58,12 +58,12 @@
 (setq auto-save-default t)
 
 ;; open in full-screen on linux (gnome?) and maximized on windoof
-(if (eq system-type 'gnu/linux)
+;(if (eq system-type 'gnu/linux)
   ; something for linux if true
-  (add-hook 'window-setup-hook #'toggle-frame-fullscreen)
+;  (add-hook 'window-setup-hook #'toggle-frame-fullscreen)
   ; optional something if not
   (add-hook 'window-setup-hook #'toggle-frame-maximized)
-)
+;)
 
 ;; enable word count in modline for GFM, Markdown and Org files
 ;; show encoding in modeline
@@ -88,6 +88,10 @@
         ;; show [...] instead of just three dots
         org-ellipsis " [...] "
 
+        ;; show utf-8 bullets correctly
+        ;; org-superstar-headline-bullets-list '("?" "?" "?" "?" "?")
+        org-modern-fold-stars '(("▶" . "▼") ("▷" . "▽") ("▸" . "▾") ("▹" . "▿") ("▸" . "▾"))
+        
         ;; start calendar on monday
         org-agenda-start-on-weekday nil
 
@@ -177,7 +181,7 @@
                       (org-deadline-warning-days 0)
                       (org-deadline-past-days 0)
                       (org-scheduled-past-days 0)
-                      (org-agenda-prefix-format "%s")
+                      (org-agenda-prefix-format "%(or (org-entry-get (point) \"PARTICIPANT\") \"\")")
                       (org-super-agenda-groups
                        '((:name "Today"
                                 :time-grid t
@@ -189,8 +193,13 @@
                        (org-agenda-prefix-format "%s")
                        (org-agenda-skip-scheduled-if-done t)
                        (org-agenda-skip-scheduled-if-deadline-is-shown t)
-                       (org-agenda-prefix-format "%(let ((scheduled (org-get-scheduled-time (point)))) (if scheduled (format-time-string \"%Y-%m-%d\" scheduled) \"\")) ")
-                       (org-super-agenda-groups
+                       (org-agenda-prefix-format
+;;                               "%(concat (let ((scheduled (org-get-scheduled-time (point)))) (if scheduled (format-time-string \"%Y-%m-%d \" scheduled) \"\"))
+;;                                         (or (org-entry-get (point) \"PARTICIPANT\" t) \"\") \" \")")
+;;      "%(or (org-entry-get (point) \"PARTICIPANT\" t) \"\")")
+;;      "%(concat \"test: \" (or (org-entry-get (point) \"PARTICIPANT\" t) \"none\"))")
+"%(triplem/org-agenda-prefix)")
+                        (org-super-agenda-groups
                         '((:name "Due Soon"
                                  :deadline future
                                  :scheduled future
@@ -281,3 +290,17 @@
       (org-time-stamp nil nil)
       (buffer-substring (point-min) (point-max))))
 
+(defun triplem/org-add-participant-on-wait ()
+  "Add a PARTICIPANT property when the TODO state becomes WAIT."
+  (when (string= org-state "WAIT")
+    (let ((participant (read-string "Participant: ")))
+      (org-set-property "PARTICIPANT" participant))))
+
+(add-hook 'org-after-todo-state-change-hook #'triplem/org-add-participant-on-wait)
+
+(defun triplem/org-agenda-prefix ()
+  (let ((scheduled (org-get-scheduled-time (point)))
+        (participant (org-entry-get (point) "PARTICIPANT" t)))
+    (concat (if scheduled (format-time-string "%Y-%m-%d " scheduled) "")
+            (or participant "")
+            " ")))

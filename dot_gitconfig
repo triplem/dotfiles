@@ -3,3 +3,7 @@
 	name = triplem
 [init]
 	defaultBranch = main
+[pull]
+	rebase = true
+[url "https://"]
+	insteadOf = git://
