@@ -131,6 +131,14 @@
              :prepend t
              :kill-buffer t)))
 
+  ;; html-export options
+;  (setq org-html-head-extra (concat "<style type=\"type/css\">\n"
+;                                    (with-temp-buffer
+;                                      (insert-file-contents (concat doom-user-dir "org.css"))
+;                                      (buffer-string))
+;                                    "</style>"))
+  (setq org-html-head-extra (concat "<link rel=\"stylesheet\" href=\"" doom-user-dir "org.css" "\"/>"))
+
   ;; some additional configs for org journal
   (setq org-journal-file-type 'weekly)
   (setq org-journal-start-on-weekday calendar-week-start-day)
@@ -190,15 +198,10 @@
                                 :tag "regeltasks"
                                 :order 1)))))
           (alltodo "" ((org-agenda-overriding-header "")
-                       (org-agenda-prefix-format "%s")
                        (org-agenda-skip-scheduled-if-done t)
                        (org-agenda-skip-scheduled-if-deadline-is-shown t)
                        (org-agenda-prefix-format
-;;                               "%(concat (let ((scheduled (org-get-scheduled-time (point)))) (if scheduled (format-time-string \"%Y-%m-%d \" scheduled) \"\"))
-;;                                         (or (org-entry-get (point) \"PARTICIPANT\" t) \"\") \" \")")
-;;      "%(or (org-entry-get (point) \"PARTICIPANT\" t) \"\")")
-;;      "%(concat \"test: \" (or (org-entry-get (point) \"PARTICIPANT\" t) \"none\"))")
-"%(triplem/org-agenda-prefix)")
+                         "%(triplem/org-agenda-prefix)") 
                         (org-super-agenda-groups
                         '((:name "Due Soon"
                                  :deadline future
@@ -250,6 +253,9 @@
 ;; needlessly confusing. Luckily we can shut off just pretty-code-mode by
 ;; setting this variable.
 (setq +pretty-code-enabled-modes nil)
+
+;; latex-mode
+(setq +latex-viewers '(pdf-tools))
 
 ;; config settings for adoc-mode
 ;; i am not fully convinced that this theme is really nice, but it is better then the default one
