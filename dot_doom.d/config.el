@@ -65,6 +65,13 @@
   (add-hook 'window-setup-hook #'toggle-frame-maximized)
 ;)
 
+;; Tell Emacs that Right Alt is not Meta
+(setq x-alt-keysym 'alt)
+(setq x-hyper-keysym 'hyper)
+
+;; Unbind Alt_R from Meta completely
+(global-unset-key (kbd "<Alt_R>"))
+
 ;; enable word count in modline for GFM, Markdown and Org files
 ;; show encoding in modeline
 (setq doom-modeline-enable-word-count t
@@ -189,7 +196,8 @@
                       (org-deadline-warning-days 0)
                       (org-deadline-past-days 0)
                       (org-scheduled-past-days 0)
-                      (org-agenda-prefix-format "%(let ((p (org-entry-get (point) \"PARTICIPANT\"))) (when p (concat p \" \")))")
+                      (org-agenda-prefix-format 
+                          "%(triplem/org-agenda-participant-prefix)")
                       (org-super-agenda-groups
                        '((:name "Today"
                                 :time-grid t
@@ -309,3 +317,7 @@
     (concat (if scheduled (format-time-string "%Y-%m-%d " scheduled) "")
             (if participant (concat participant " ") ""))))
 
+(defun triplem/org-agenda-participant-prefix ()
+  "Return participant prefix for agenda view."
+  (let ((p (org-entry-get (point) "PARTICIPANT")))
+    (if p (concat p " ") "")))
