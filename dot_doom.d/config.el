@@ -196,12 +196,12 @@
                       (org-deadline-warning-days 0)
                       (org-deadline-past-days 0)
                       (org-scheduled-past-days 0)
-                      (org-agenda-prefix-format 
-                          "%(triplem/org-agenda-participant-prefix)")
+                      (org-agenda-prefix-format "%(triplem/org-agenda-prefix-without-date)")
                       (org-super-agenda-groups
                        '((:name "Today"
                                 :time-grid t
                                 :date today
+                                :deadline today
                                 :scheduled today
                                 :tag "regeltasks"
                                 :order 1)))))
@@ -209,8 +209,11 @@
                        (org-agenda-skip-scheduled-if-done t)
                        (org-agenda-skip-scheduled-if-deadline-is-shown t)
                        (org-agenda-prefix-format "%(triplem/org-agenda-prefix)") 
-                        (org-super-agenda-groups
-                        '((:name "Due Soon"
+                       (org-super-agenda-groups
+                        '(
+                          (:discard (:scheduled today))
+                          (:discard (:deadline today))
+                          (:name "Due Soon"
                                  :deadline future
                                  :scheduled future
                                  :order 7)
@@ -218,9 +221,13 @@
                                  :deadline past
                                  :scheduled past
                                  :order 8)
+                          (:name "Not Scheduled"
+                                 :deadline nil
+                                 :scheduled nil
+                                 :order 9)
                           (:discard (:not (:todo ("TODO" "MEET" "WAIT"))))
-                          (:discard (:date today))
-                          (:discard (:scheduled today)))))))))))
+                          ))))
+         )))))
 
 ;; Save the changed buffer after state changes
 (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
@@ -303,6 +310,8 @@
       (org-time-stamp nil nil)
       (buffer-substring (point-min) (point-max))))
 
+;; handle participants on WAIT level
+;; if status changes to WAIT org-mode will ask for the Participant Property
 (defun triplem/org-add-participant-on-wait ()
   "Add a PARTICIPANT property when the TODO state becomes WAIT."
   (when (string= org-state "WAIT")
@@ -311,13 +320,48 @@
 
 (add-hook 'org-after-todo-state-change-hook #'triplem/org-add-participant-on-wait)
 
+;; construct org-agenda-prefix to show participants in the agenda after the scheduled date but
+;; before the status
 (defun triplem/org-agenda-prefix ()
   (let ((scheduled (org-get-scheduled-time (point)))
+        (deadline (org-get-deadline-time (point)))
         (participant (org-entry-get (point) "PARTICIPANT" t)))
-    (concat (if scheduled (format-time-string "%Y-%m-%d " scheduled) "")
+    (concat " "
+            (if scheduled (format-time-string "%Y-%m-%d " scheduled) "")
+            (if deadline (format-time-string "%Y-%m-%d " deadline) "")
             (if participant (concat participant " ") ""))))
 
-(defun triplem/org-agenda-participant-prefix ()
-  "Return participant prefix for agenda view."
-  (let ((p (org-entry-get (point) "PARTICIPANT")))
-    (if p (concat p " ") "")))
+;; construct org-agenda-prefix to show participants without any date
+;; there is a space before the content, then the keyword is shown boxed
+(defun triplem/org-agenda-prefix-without-date ()
+  (let ((scheduled (org-get-scheduled-time (point)))
+        (deadline (org-get-deadline-time (point)))
+        (participant (org-entry-get (point) "PARTICIPANT" t)))
+    (concat " "
+            (if participant (concat participant " ") ""))))
+
+
+;; format tags to export delegates nicely to HTML
+;; not used right now
+(defun triplem/org-html--tags (tags info)
+    "Format TAGS into HTML.
+     INFO is a plist containing export options."
+  (when tags
+    (format "<span class=\"tag\">%s</span>"
+        (mapconcat
+         (lambda (tag)
+           (format "%s" tag))
+         tags  "&#xa0;"))))
+
+(defun triplem/org-html-format-headline-function
+    (todo _todo-type priority text tags info)
+    "Default format function for a headline.
+     See `org-html-format-headline-function' for details."
+  (let ((todo (org-html--todo todo info))
+        (priority (org-html--priority priority info))
+        (tags (triplem/org-html--tags tags info)))
+    (concat todo (and todo " ")
+        priority (and priority " ")
+        text
+        tags)))
+
