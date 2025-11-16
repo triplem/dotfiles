@@ -403,7 +403,7 @@
           (message "Filter running!") ; Debug message
           (replace-regexp-in-string
            "<span class=\"\\(todo\\|done\\) [^\"]*\">[^<]*</span>\\s-*"
-           "<li>"
+           ""
            text))
       text))  ; Important: always return text
 
@@ -411,7 +411,7 @@
                'triplem/remove-all-todo-keywords))
 
 
-(defcustom triplem/meetings-directory "~/meetings/"
+(defcustom triplem/meetings-directory "~/org-mode"
   "Directory where meeting files are stored."
   :type 'string
   :group 'triplem)
@@ -422,7 +422,7 @@
   (let* ((meeting-name (read-string "Meeting Name: "))
          (meeting-date (org-read-date nil nil nil "Meeting Date: "))
          (date-formatted (format-time-string "%Y-%m-%d" (org-time-string-to-time meeting-date)))
-         (filename (format "%s-%s.org" 
+         (filename (format "meeting-%s-%s.org" 
                           (replace-regexp-in-string "[^a-zA-Z0-9-]" "-" 
                                                    (downcase meeting-name))
                           date-formatted))

@@ -6,7 +6,7 @@
 #+TITLE: `(or yas-meeting-name "Meeting Name")`
 #+DATE: `(or yas-meeting-date "")`
 #+AUTHOR: Markus M. May
-#+OPTIONS: toc:nil author:nil creator:nil 
+#+OPTIONS: toc:nil  html-postamble:nil
 #+HTML_HEAD_EXTRA: <link rel="stylesheet" type="text/css" href="/home/triplem/.doom.d/meeting.css"/>
 
 * Teilnehmer
@@ -24,7 +24,7 @@ DEADLINE: <2025-11-08 So>
   - Unterpunkt 2
   - ...
   
-** Eine Entscheidung :Desicion:
+** Eine Entscheidung :Decision:
 
 * Actions
 
@@ -33,7 +33,7 @@ DEADLINE: <2025-11-08 So>
 
 * Entscheidungen
 
-#+BEGIN: columnview :id global :match "Desicion" :format "%ITEM(Entscheidungen)"
+#+BEGIN: columnview :id global :match "Decision" :format "%ITEM(Entscheidungen)"
 #+END:
 
 #+BEGIN_COMMENT
