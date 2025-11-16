@@ -74,3 +74,22 @@
               (message "Deleted file %s." filename)
               (kill-buffer)))
       (message "Not a file visiting buffer!"))))
+
+
+(defun triplem/count-workdays (start-date end-date)
+ "Count workdays between START-DATE and END-DATE (excluding weekends).
+  Returns negative number if end-date is before start-date."
+  (let* ((start (org-time-string-to-time start-date))
+         (end (org-time-string-to-time end-date))
+         (start-days (time-to-days start))
+         (end-days (time-to-days end))
+         (workdays 0)
+         (direction (if (< start-days end-days) 1 -1)))
+    (dotimes (i (abs (- end-days start-days)))
+      (let* ((current-days (+ start-days (* direction i)))
+             (current-date (calendar-gregorian-from-absolute current-days))
+             (day-of-week (calendar-day-of-week current-date)))
+        ;; Count if not Saturday (6) or Sunday (0)
+        (when (and (not (= day-of-week 0)) (not (= day-of-week 6)))
+          (setq workdays (1+ workdays)))))
+    (* direction workdays)))

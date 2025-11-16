@@ -110,6 +110,8 @@
 
         org-agenda-span 'week
 
+        org-export-allow-bind-keywords t
+        
         ;; personal keywords for my workflow
         org-todo-keywords
           '((sequence "TODO(t)" "WAIT(w@/!)" "|" "DONE(d!)" "CANC(c@/!)")
@@ -341,27 +343,104 @@
             (if participant (concat participant " ") ""))))
 
 
-;; format tags to export delegates nicely to HTML
-;; not used right now
-(defun triplem/org-html--tags (tags info)
-    "Format TAGS into HTML.
-     INFO is a plist containing export options."
-  (when tags
-    (format "<span class=\"tag\">%s</span>"
-        (mapconcat
-         (lambda (tag)
-           (format "%s" tag))
-         tags  "&#xa0;"))))
+;; The following is a specific handling of meeting-pages
+;; based on a yasnippet for meeting agends/ notes
+;; For the columnvies in meeting notes, several transformations are required
+;; the First One is for Tags (eg. Name of the Responsible Person)
+(with-eval-after-load 'org-colview
+  (require 'calendar)
+  
+  (defun triplem/org-columns-dblock-write-meetings (ipos table params)
+    "Custom columnview formatter with German formatting."
+    ;; Get document creation date or use today
+;;#+BEGIN: columnview :id global :match "/TODO|DONE" :format "%ITEM(Was) %TAGS(Wer) %DEADLINE(Wann) %TODO(Status) %PARTICIPANT(Props)" :formatter triplem/org-columns-dblock-write-meetings 
+    (let ((doc-date (or (org-entry-get nil "CREATED" t)
+                        (format-time-string "[%Y-%m-%d]"))))
+      ;; Format the table data before inserting
+      (let ((formatted-table
+             (cons (car table)  ; Keep header as-is
+                   (mapcar
+                    (lambda (row)
+                      (if (eq row 'hline)
+                          row
+                        (mapcar
+                         (lambda (cell)
+                           ;; Only process strings
+                           (if (not (stringp cell))
+                               cell
+                             (cond
+                              ;; Format tags
+                              ((string-match "^:\\(.+\\):$" cell)
+                               (mapconcat 'identity 
+                                         (split-string (match-string 1 cell) ":" t)
+                                         ", "))
+                              ;; Format dates and add workdays
+                              ((string-match "\\[\\([0-9]\\{4\\}\\)-\\([0-9]\\{2\\}\\)-\\([0-9]\\{2\\}\\)" cell)
+                               (let* ((german-date (replace-regexp-in-string 
+                                                   "\\[\\([0-9]\\{4\\}\\)-\\([0-9]\\{2\\}\\)-\\([0-9]\\{2\\}\\)[^]]*\\]"
+                                                   "\\3.\\2.\\1"
+                                                   cell))
+                                      (workdays (triplem/count-workdays doc-date cell)))
+                                 (format "%s (%d AT)" german-date workdays)))
+                              ;; Format TODO states
+                              ((string= cell "TODO") "Offen")
+                              ((string= cell "DONE") "Erledigt")
+                              ;; Default: return cell unchanged
+                              (t cell))))
+                         row)))
+                    (cdr table)))))
+        ;; Now call the default formatter with the formatted table
+        (funcall (default-value 'org-columns-dblock-formatter) ipos formatted-table params)))))
 
-(defun triplem/org-html-format-headline-function
-    (todo _todo-type priority text tags info)
-    "Default format function for a headline.
-     See `org-html-format-headline-function' for details."
-  (let ((todo (org-html--todo todo info))
-        (priority (org-html--priority priority info))
-        (tags (triplem/org-html--tags tags info)))
-    (concat todo (and todo " ")
-        priority (and priority " ")
-        text
-        tags)))
+(with-eval-after-load 'ox-html
+  ;; Remove ALL previous filters
+  ;; Simple filter to remove ALL TODO keywords everywhere
+   ;; Simple filter to remove ALL TODO keywords everywhere
+  (defun triplem/remove-all-todo-keywords (text backend info)
+    "Remove all TODO/DONE keywords from HTML export."
+    (if (org-export-derived-backend-p backend 'html)
+        (progn
+          (message "Filter running!") ; Debug message
+          (replace-regexp-in-string
+           "<span class=\"\\(todo\\|done\\) [^\"]*\">[^<]*</span>\\s-*"
+           "<li>"
+           text))
+      text))  ; Important: always return text
+
+  (add-to-list 'org-export-filter-final-output-functions
+               'triplem/remove-all-todo-keywords))
+
+
+(defcustom triplem/meetings-directory "~/meetings/"
+  "Directory where meeting files are stored."
+  :type 'string
+  :group 'triplem)
+
+(defun triplem/create-meeting ()
+  "Create a new meeting file with name and date, then expand snippet."
+  (interactive)
+  (let* ((meeting-name (read-string "Meeting Name: "))
+         (meeting-date (org-read-date nil nil nil "Meeting Date: "))
+         (date-formatted (format-time-string "%Y-%m-%d" (org-time-string-to-time meeting-date)))
+         (filename (format "%s-%s.org" 
+                          (replace-regexp-in-string "[^a-zA-Z0-9-]" "-" 
+                                                   (downcase meeting-name))
+                          date-formatted))
+         (filepath (expand-file-name filename triplem/meetings-directory)))
+    
+    ;; Erstelle Verzeichnis falls nicht vorhanden
+    (unless (file-exists-p (file-name-directory filepath))
+      (make-directory (file-name-directory filepath) t))
+    
+    ;; Öffne neue Datei
+    (find-file filepath)
+    
+    ;; Setze lokale Variablen für das Snippet
+    (setq-local yas-meeting-name meeting-name)
+    (setq-local yas-meeting-date meeting-date)
+   
+    ;; Expandiere das Snippet
+    (yas-expand-snippet (yas-lookup-snippet "meeting" 'org-mode))
+    
+    (message "Meeting file created: %s" filepath)))
 

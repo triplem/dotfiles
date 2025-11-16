@@ -1,0 +1,46 @@
+# -*- mode: snippet -*-
+# name: meeting
+# key: meeting
+# contributor : Markus M. May
+# --
+#+TITLE: `(or yas-meeting-name "Meeting Name")`
+#+DATE: `(or yas-meeting-date "")`
+#+AUTHOR: Markus M. May
+#+OPTIONS: toc:nil author:nil creator:nil 
+#+HTML_HEAD_EXTRA: <link rel="stylesheet" type="text/css" href="/home/triplem/.doom.d/meeting.css"/>
+
+* Teilnehmer
+  - $0
+  - Markus
+
+* Agenda
+
+* Notizen
+** TODO Task1 :Verantwortlich:
+DEADLINE: <2025-11-08 So>
+
+** TODO Task2 :Markus:
+  - Unterpunkt 1
+  - Unterpunkt 2
+  - ...
+  
+** Eine Entscheidung :Desicion:
+
+* Actions
+
+#+BEGIN: columnview :id global :match "/TODO|DONE" :format "%ITEM(Was) %TAGS(Wer) %DEADLINE(Wann) %TODO(Status)" :formatter triplem/org-columns-dblock-write-meetings 
+#+END:
+
+* Entscheidungen
+
+#+BEGIN: columnview :id global :match "Desicion" :format "%ITEM(Entscheidungen)"
+#+END:
+
+#+BEGIN_COMMENT
+To update data views, use M-x org-dblock-update in dblock, or M-x org-update-all-dblocks to update all dynamic blocks.
+
+#+END_COMMENT
+
+# Local Variables:
+# eval: (add-hook 'before-save-hook 'org-update-all-dblocks nil t)
+# End:
