@@ -55,7 +55,8 @@
 (setq display-line-numbers-type 'relative)
 
 ;; auto-save
-(setq auto-save-default t)
+(setq auto-save-visited-mode t)
+(auto-save-visited-mode +1)
 
 ;; open in full-screen on linux (gnome?) and maximized on windoof
 ;(if (eq system-type 'gnu/linux)
