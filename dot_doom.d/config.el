@@ -9,6 +9,8 @@
 ;; load personal varialbes
 (load-file (concat doom-user-dir "personal.el"))
 
+;; load org-db-v3
+(load-file (concat doom-user-dir "org-db-v3.el"))
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.

@@ -48,6 +48,7 @@
 ;(unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
+
 ;; german holidays shows german-holidays in agenda
 (package! german-holidays)
 ;; use gopass as an auth-source (eg for mu4e)
@@ -60,3 +61,6 @@
 (package! org-super-agenda)
 ;; use org-contacts - eg. for birthday lists
 (package! org-contacts)
+
+;; packages used for org-db-v3 (see https://github.com/jkitchin/org-db-v3)
+(package! plz)

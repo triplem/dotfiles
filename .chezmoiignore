@@ -1,2 +1,3 @@
 README.org
 **/__pycache__/
+.venv
