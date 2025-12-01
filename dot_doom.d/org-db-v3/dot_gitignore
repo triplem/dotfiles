@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Emacs
+*.elc
+*~
+\#*\#
+.\#*
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+
+# Local development database directory (keep README.md)
+/db/*.db*
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Development files
+tasks.org
+reload.el
+
+# Backup files
+*.bak
+*.bak[0-9]
+*.backup
+
+# Examples output
+examples/.ob-jupyter/
+examples/screenshots/
