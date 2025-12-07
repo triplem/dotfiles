@@ -9,9 +9,6 @@
 ;; load personal varialbes
 (load-file (concat doom-user-dir "personal.el"))
 
-;; load org-db-v3
-(load-file (concat doom-user-dir "org-db-v3.el"))
-
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
 (setq user-full-name triplem/full-name
@@ -194,7 +191,7 @@
   (setq org-agenda-include-diary t
         org-agenda-sorting-strategy '(scheduled-down deadline-down)
         org-agenda-custom-commands
-     '(("T" "start Today View"
+     '(("V" "start Today View"
          ((agenda "" ((org-agenda-span 'day)
                       (org-agenda-start-on-weekday nil)
                       (org-agenda-start-day "0d")
@@ -227,6 +224,7 @@
                                  :scheduled past
                                  :order 8)
                           (:name "Not Scheduled"
+                                 :date nil
                                  :deadline nil
                                  :scheduled nil
                                  :order 9)
@@ -272,6 +270,9 @@
 ;; needlessly confusing. Luckily we can shut off just pretty-code-mode by
 ;; setting this variable.
 (setq +pretty-code-enabled-modes nil)
+
+;; load org-db-v3
+(load-file (concat doom-user-dir "org-db-v3.el"))
 
 ;; latex-mode
 (setq +latex-viewers '(pdf-tools))

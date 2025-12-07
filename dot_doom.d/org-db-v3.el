@@ -2,8 +2,6 @@
 (add-to-list 'load-path (concat doom-user-dir "org-db-v3/elisp"))
 (require 'org-db-v3)
 
-(setq org-db-v3-python-command "python")
-
 ;; Auto-start server when Emacs starts (optional)
 (setq org-db-v3-auto-start-server t)
 
