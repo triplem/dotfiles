@@ -2,3 +2,4 @@ README.org
 **/__pycache__/
 **/.venv/
 **/.venv/**
+**/run/
