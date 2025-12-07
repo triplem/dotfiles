@@ -115,7 +115,7 @@
         ;; personal keywords for my workflow
         org-todo-keywords
           '((sequence "TODO(t)" "WAIT(w@/!)" "|" "DONE(d!)" "CANC(c@/!)")
-            (sequence "MEET(m)" "|" "DONE(d!)" "CANC(c@/!)"))
+            (sequence "MEET(m)" "|" "DONE(d@/!)" "CANC(c@/!)"))
 
         ;; personal coloring of keywords
         org-todo-keyword-faces
@@ -138,14 +138,13 @@
             ("s" "Scheduled" entry (file+headline +org-capture-inbox-file "Inbox")
              "** TODO %^{TITLE}\nSCHEDULED: <%(org-read-date)>\n"
              :prepend t
-             :kill-buffer t)))
+             :kill-buffer t)
+            ("j" "Journal entry" plain (function triplem/org-journal-find-location)
+             "** %(format-time-string org-journal-time-format)%^{Title}\n%i%?"
+             :jump-to-captured t
+             :immediate-finish t)))
 
   ;; html-export options
-;  (setq org-html-head-extra (concat "<style type=\"type/css\">\n"
-;                                    (with-temp-buffer
-;                                      (insert-file-contents (concat doom-user-dir "org.css"))
-;                                      (buffer-string))
-;                                    "</style>"))
   (setq org-html-head-extra (concat "<link rel=\"stylesheet\" href=\"" doom-user-dir "org.css" "\"/>"))
 
   ;; some additional configs for org journal
@@ -155,7 +154,7 @@
   (setq org-journal-carryover-items  "TODO=\"TODO\"|TODO=\"MEET\"|TODO=\"WAIT\"")
   (setq org-journal-enable-agenda-integration t)
 
-  (defun org-journal-file-header-func (time)
+  (defun triplem/org-journal-file-header-func (time)
     "Custom function to create journal header for weekly org-journal files.
      TIME is the start date of the week."
     (let* ((start-of-week (triplem/iso-beginning-of-week time))
@@ -168,7 +167,15 @@
      "\n#+FILETAGS: journal W" (format-time-string "%V/%Y" time)
      "\n#+STARTUP: overview")))
 
-  (setq org-journal-file-header 'org-journal-file-header-func)
+(defun triplem/org-journal-find-location ()
+  ;; Open today's journal, but specify a non-nil prefix argument in order to
+  ;; inhibit inserting the heading; org-capture will insert the heading.
+  (org-journal-new-entry t)
+  (unless (eq org-journal-file-type 'daily)
+    (org-narrow-to-subtree))
+  (goto-char (point-max)))
+
+  (setq org-journal-file-header 'triplem/org-journal-file-header-func)
 
   ;; refile settings -- limit to second level
   (setq org-refile-targets
