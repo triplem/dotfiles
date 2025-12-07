@@ -272,6 +272,8 @@
 (setq +pretty-code-enabled-modes nil)
 
 ;; load org-db-v3
+;; see https://github.com/jkitchin/org-db-v3/tree/main
+;; local server: http://127.0.0.1:8765
 (load-file (concat doom-user-dir "org-db-v3.el"))
 
 ;; latex-mode
