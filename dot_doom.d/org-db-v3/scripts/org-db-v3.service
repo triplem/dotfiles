@@ -1,0 +1,19 @@
+# Source - https://stackoverflow.com/a
+# Posted by James_SO
+# Retrieved 2025-12-19, License - CC BY-SA 4.0
+
+[Unit]
+Description=Org-DB-V3
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=triplem
+Environment=PYTHONUNBUFFERED=1
+WorkingDirectory=/home/triplem/.doom.d/org-db-v3/python
+ExecStart=uv run uvicorn org_db_server.main:app --reload --port 8765
+Restart=on-abort
+
+[Install]
+WantedBy=default.target
+

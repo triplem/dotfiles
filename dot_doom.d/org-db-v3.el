@@ -3,5 +3,5 @@
 (require 'org-db-v3)
 
 ;; Auto-start server when Emacs starts (optional)
-(setq org-db-v3-auto-start-server t)
+;;(setq org-db-v3-auto-start-server t)
 
