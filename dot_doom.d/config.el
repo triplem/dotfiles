@@ -283,6 +283,9 @@
 ;; local server: http://127.0.0.1:8765
 (load-file (concat doom-user-dir "org-db-v3.el"))
 
+;; automatically sync org-mode-files
+(load-file (concat doom-user-dir "git-sync.el"))
+
 ;; latex-mode
 (setq +latex-viewers '(pdf-tools))
 
