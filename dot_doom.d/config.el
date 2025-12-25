@@ -88,6 +88,9 @@
 (setq triplem/org-capture-inbox-file "inbox.org")
 (setq +org-capture-inbox-file (expand-file-name triplem/org-capture-inbox-file org-directory))
 
+;; archive subtrees to the same files in the archive folder
+(setq org-archive-location "archive/%s::")
+
 ;; org-mode
 (after! org
   (setq org-startup-folded 'show2levels
