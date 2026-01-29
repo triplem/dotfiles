@@ -15,7 +15,7 @@
          (lambda (dn)
            (setq autocommit-dir-set (remove dn autocommit-dir-set))
            (message (concat "Committing org files in " dn))
-           (shell-command (concat "cd " dn " && git commit -m 'Changes on '" (system-name) "' at '" (current-time-string) "'"))  
+           (shell-command (concat "cd " dn " && git commit -m 'Changes on " (system-name) " at " (current-time-string) "'"))  
            (shell-command (concat "cd " dn " && git push & /usr/bin/true")))
          dn)
         (setq autocommit-dir-set (cons dn autocommit-dir-set)))))

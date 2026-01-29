@@ -141,11 +141,7 @@
             ("s" "Scheduled" entry (file+headline +org-capture-inbox-file "Inbox")
              "** TODO %^{TITLE}\nSCHEDULED: <%(org-read-date)>\n"
              :prepend t
-             :kill-buffer t)
-            ("j" "Journal entry" plain (function triplem/org-journal-find-location)
-             "** %(format-time-string org-journal-time-format)%^{Title}\n%i%?"
-             :jump-to-captured t
-             :immediate-finish t)))
+             :kill-buffer t)))
 
   ;; html-export options
   (setq org-html-head-extra (concat "<link rel=\"stylesheet\" href=\"" doom-user-dir "org.css" "\"/>"))
