@@ -2,7 +2,8 @@
 
 ;; Automatically add, commit, and push when files change.
 
-(defvar autocommit-dir-set '(org-directory)
+(defvar autocommit-dir-set `(,org-directory
+                             ,org-journal-dir)
   "Set of directories for which there is a pending timer job")
 
 (defun autocommit-schedule-commit (dn)
