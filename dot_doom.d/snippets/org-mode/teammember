@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: Teammember 
+# key: tm 
+# condition: t
+# --
+#+TITLE: Team - ${1:Team Member Name}
+#+CATEGORY: $1
+
+* Team - $1       :team:${1:$(replace-regexp-in-string " " "" yas-text)}:
+:PROPERTIES:
+:BIRTHDAY:
+:END:
+
+** Allgemein
